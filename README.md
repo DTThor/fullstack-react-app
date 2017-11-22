@@ -1,2 +1,2 @@
 # fullstack-react-app
-A fullstack app built with React for practice
+A fullstack blog app built with React for practice
