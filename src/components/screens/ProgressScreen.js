@@ -1,6 +1,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { programs } from '../../data/programs';
+import { calcStreak } from '../../utils/stats';
 
 function BarChart({ data, label }) {
   const max = Math.max(...data.map(d => d.value), 1);
@@ -46,6 +47,8 @@ function MilestoneItem({ achieved, label, desc }) {
 export default function ProgressScreen() {
   const history = useSelector(s => s.workout.history);
   const user = useSelector(s => s.user);
+  const streak = calcStreak(history);
+  const totalWorkouts = history.length;
 
   // Build weekly volume data for last 8 weeks
   const weeklyData = (() => {
@@ -97,11 +100,11 @@ export default function ProgressScreen() {
 
   const milestones = [
     { label: '1st Workout', desc: 'Complete your first session', achieved: history.length >= 1 },
-    { label: 'Week Warrior', desc: '7-day streak', achieved: user.streak >= 7 },
-    { label: 'Iron 10', desc: 'Complete 10 workouts', achieved: user.totalWorkouts >= 10 },
-    { label: 'Consistency', desc: 'Complete 25 workouts', achieved: user.totalWorkouts >= 25 },
-    { label: 'Dedicated', desc: 'Complete 50 workouts', achieved: user.totalWorkouts >= 50 },
-    { label: 'SHRED Elite', desc: '30-day streak', achieved: user.streak >= 30 },
+    { label: 'Week Warrior', desc: '7-day streak', achieved: streak >= 7 },
+    { label: 'Iron 10', desc: 'Complete 10 workouts', achieved: totalWorkouts >= 10 },
+    { label: 'Consistency', desc: 'Complete 25 workouts', achieved: totalWorkouts >= 25 },
+    { label: 'Dedicated', desc: 'Complete 50 workouts', achieved: totalWorkouts >= 50 },
+    { label: 'SHRED Elite', desc: '30-day streak', achieved: streak >= 30 },
   ];
 
   return (
@@ -113,8 +116,8 @@ export default function ProgressScreen() {
 
       {/* Key stats */}
       <div className="progress-stats-grid">
-        <StatCard value={user.streak} label="Day Streak" sub="🔥 Keep it up" color="#A3E635" />
-        <StatCard value={user.totalWorkouts} label="Workouts" sub="Total sessions" />
+        <StatCard value={streak} label="Day Streak" sub="🔥 Keep it up" color="#A3E635" />
+        <StatCard value={totalWorkouts} label="Workouts" sub="Total sessions" />
         <StatCard value={totalSets} label="Total Sets" sub="All time" />
         <StatCard value={avgDuration + 'm'} label="Avg Duration" sub="Per session" />
       </div>

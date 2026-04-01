@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { updateUser, setApiKey } from '../../store/userSlice';
+import { calcStreak } from '../../utils/stats';
 
 const GOALS = ['Build Muscle', 'Lose Fat', 'Improve Endurance', 'Get Stronger', 'Stay Active'];
 const LEVELS = ['Beginner', 'Intermediate', 'Advanced'];
@@ -10,6 +11,8 @@ export default function ProfileScreen() {
   const dispatch = useDispatch();
   const user = useSelector(s => s.user);
   const history = useSelector(s => s.workout.history);
+  const streak = calcStreak(history);
+  const totalWorkouts = history.length;
 
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState({ ...user });
@@ -73,11 +76,11 @@ export default function ProfileScreen() {
       {/* Lifetime stats */}
       <div className="profile-stats">
         <div className="profile-stat">
-          <span className="profile-stat__value">{user.totalWorkouts}</span>
+          <span className="profile-stat__value">{totalWorkouts}</span>
           <span className="profile-stat__label">Workouts</span>
         </div>
         <div className="profile-stat">
-          <span className="profile-stat__value">{user.streak}</span>
+          <span className="profile-stat__value">{streak}</span>
           <span className="profile-stat__label">Streak</span>
         </div>
         <div className="profile-stat">

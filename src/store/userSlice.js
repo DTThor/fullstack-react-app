@@ -19,9 +19,7 @@ const defaultUser = {
   weightUnit: 'lbs',
   activeProgramId: 'power-shred',
   anthropicApiKey: '',
-  streak: 7,
-  totalWorkouts: 42,
-  joinDate: '2025-10-01',
+  joinDate: new Date().toISOString().split('T')[0],
 };
 
 const initialState = loadUser() || defaultUser;
@@ -42,13 +40,8 @@ const userSlice = createSlice({
       state.anthropicApiKey = action.payload;
       localStorage.setItem('shred_user', JSON.stringify(state));
     },
-    incrementStreak(state) {
-      state.streak += 1;
-      state.totalWorkouts += 1;
-      localStorage.setItem('shred_user', JSON.stringify(state));
-    },
   },
 });
 
-export const { updateUser, setActiveProgram, setApiKey, incrementStreak } = userSlice.actions;
+export const { updateUser, setActiveProgram, setApiKey } = userSlice.actions;
 export default userSlice.reducer;

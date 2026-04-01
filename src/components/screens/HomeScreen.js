@@ -2,6 +2,7 @@ import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { startWorkout } from '../../store/workoutSlice';
 import { programs } from '../../data/programs';
+import { calcStreak, calcWeeklyCount } from '../../utils/stats';
 
 function getGreeting() {
   const h = new Date().getHours();
@@ -34,11 +35,9 @@ export default function HomeScreen({ onNavigate }) {
   const nextDay = program.days[nextDayIndex];
 
   const lastWorkout = history[0];
-  const weeklyCount = history.filter(w => {
-    const d = new Date(w.date);
-    const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-    return d >= weekAgo;
-  }).length;
+  const weeklyCount = calcWeeklyCount(history);
+  const streak = calcStreak(history);
+  const totalWorkouts = history.length;
 
   const handleStartWorkout = () => {
     dispatch(startWorkout({
@@ -70,7 +69,7 @@ export default function HomeScreen({ onNavigate }) {
         </div>
         <div className="streak-badge">
           <span className="streak-fire">🔥</span>
-          <span className="streak-count">{user.streak}</span>
+          <span className="streak-count">{streak}</span>
         </div>
       </div>
 
@@ -90,11 +89,11 @@ export default function HomeScreen({ onNavigate }) {
           <span className="stat-label">This Week</span>
         </div>
         <div className="stat-card">
-          <span className="stat-value">{user.totalWorkouts}</span>
+          <span className="stat-value">{totalWorkouts}</span>
           <span className="stat-label">Total</span>
         </div>
         <div className="stat-card">
-          <span className="stat-value">{user.streak}</span>
+          <span className="stat-value">{streak}</span>
           <span className="stat-label">Streak</span>
         </div>
       </div>

@@ -12,7 +12,6 @@ import {
   setCurrentExercise,
   swapExercise,
 } from '../../store/workoutSlice';
-import { incrementStreak } from '../../store/userSlice';
 import { playRestEndBeep, requestNotificationPermission, showRestEndNotification } from '../../utils/audio';
 import { getAlternatives } from '../../data/exercisePool';
 import MuscleImage from '../MuscleImage';
@@ -319,7 +318,6 @@ export default function WorkoutScreen({ onNavigate }) {
 
   const handleFinish = () => {
     dispatch(finishWorkout());
-    dispatch(incrementStreak());
     onNavigate('home');
   };
 
