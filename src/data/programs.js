@@ -1,7 +1,7 @@
 export const programs = [
   {
     id: 'power-shred',
-    name: 'Power SHRED',
+    name: 'Power',
     description: 'Build explosive strength while cutting body fat with this elite hybrid program.',
     level: 'Intermediate',
     weeks: 8,
@@ -67,7 +67,7 @@ export const programs = [
 
   {
     id: 'lean-x',
-    name: 'Lean-X',
+    name: 'Lean',
     description: 'Maximize fat burning with metabolic conditioning and targeted resistance training.',
     level: 'Beginner',
     weeks: 6,
@@ -140,7 +140,7 @@ export const programs = [
 
   {
     id: 'bulk-season',
-    name: 'Bulk Season',
+    name: 'Bulk',
     description: 'Maximum hypertrophy — pack on serious muscle with progressive overload and volume.',
     level: 'Advanced',
     weeks: 12,
@@ -207,7 +207,7 @@ export const programs = [
 
   {
     id: 'home-grind',
-    name: 'Home Grind',
+    name: 'Home',
     description: 'Zero equipment needed. Build real strength and conditioning from anywhere.',
     level: 'Beginner',
     weeks: 6,
@@ -259,7 +259,7 @@ export const programs = [
 
   {
     id: 'hiit-shred',
-    name: 'HIIT Shred',
+    name: 'HIIT',
     description: 'High intensity interval training to incinerate fat and boost your VO2 max.',
     level: 'Intermediate',
     weeks: 4,
