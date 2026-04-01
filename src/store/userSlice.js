@@ -10,7 +10,7 @@ const loadUser = () => {
 };
 
 const defaultUser = {
-  name: 'Athlete',
+  name: 'DeezNutz',
   goal: 'Build Muscle',
   level: 'Intermediate',
   equipment: ['Barbell', 'Dumbbells', 'Pull-up Bar', 'Cables'],
