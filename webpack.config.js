@@ -1,26 +1,46 @@
+const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+
 module.exports = {
-  entry: [
-    './src/index.js'
-  ],
+  entry: './src/index.js',
   output: {
-    path: __dirname,
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'bundle.js',
     publicPath: '/',
-    filename: 'bundle.js'
+    clean: true,
   },
   module: {
-    loaders: [{
-      exclude: /node_modules/,
-      loader: 'babel',
-      query: {
-        presets: ['react', 'es2015', 'stage-1']
-      }
-    }]
+    rules: [
+      {
+        test: /\.(js|jsx)$/,
+        exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: [
+              ['@babel/preset-env', { targets: 'defaults' }],
+              ['@babel/preset-react', { runtime: 'automatic' }],
+            ],
+          },
+        },
+      },
+      {
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader'],
+      },
+    ],
   },
   resolve: {
-    extensions: ['', '.js', '.jsx']
+    extensions: ['.js', '.jsx'],
   },
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: './index.html',
+    }),
+  ],
   devServer: {
     historyApiFallback: true,
-    contentBase: './'
-  }
+    port: 8080,
+    hot: true,
+  },
 };
