@@ -4,14 +4,23 @@ import { startWorkout } from '../../store/workoutSlice';
 import { programs } from '../../data/programs';
 
 function getGreeting() {
-  const hour = new Date().getHours();
-  if (hour < 12) return 'Good morning';
-  if (hour < 17) return 'Good afternoon';
+  const h = new Date().getHours();
+  if (h < 12) return 'Good morning';
+  if (h < 17) return 'Good afternoon';
   return 'Good evening';
 }
 
-function getTodayDayIndex(daysPerWeek) {
-  return new Date().getDay() % daysPerWeek;
+// Derive which day to show next based on workout history for this program
+function getNextDayIndex(program, history) {
+  const programHistory = history.filter(w => w.programId === program.id);
+  if (programHistory.length === 0) {
+    // Never done this program — start at day 0
+    return 0;
+  }
+  // Find the most recent completed day index
+  const last = programHistory[0]; // history is newest-first
+  const lastDayIndex = typeof last.dayIndex === 'number' ? last.dayIndex : 0;
+  return (lastDayIndex + 1) % program.days.length;
 }
 
 export default function HomeScreen({ onNavigate }) {
@@ -21,23 +30,22 @@ export default function HomeScreen({ onNavigate }) {
   const activeWorkout = useSelector(s => s.workout.active);
 
   const program = programs.find(p => p.id === user.activeProgramId) || programs[0];
-  const todayIndex = getTodayDayIndex(program.days.length);
-  const todayDay = program.days[todayIndex];
+  const nextDayIndex = getNextDayIndex(program, history);
+  const nextDay = program.days[nextDayIndex];
 
   const lastWorkout = history[0];
   const weeklyCount = history.filter(w => {
     const d = new Date(w.date);
-    const now = new Date();
-    const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
     return d >= weekAgo;
   }).length;
 
   const handleStartWorkout = () => {
     dispatch(startWorkout({
       programId: program.id,
-      dayIndex: todayIndex,
-      dayName: todayDay.name,
-      exercises: todayDay.exercises,
+      dayIndex: nextDayIndex,
+      dayName: nextDay.name,
+      exercises: nextDay.exercises,
     }));
     onNavigate('workout');
   };
@@ -47,6 +55,10 @@ export default function HomeScreen({ onNavigate }) {
     const s = seconds % 60;
     return `${m}m ${s}s`;
   };
+
+  // Is today's workout already done? (last history entry is today and same program)
+  const today = new Date().toISOString().split('T')[0];
+  const todayDone = lastWorkout && lastWorkout.date === today && lastWorkout.programId === program.id;
 
   return (
     <div className="screen">
@@ -79,43 +91,51 @@ export default function HomeScreen({ onNavigate }) {
         </div>
         <div className="stat-card">
           <span className="stat-value">{user.totalWorkouts}</span>
-          <span className="stat-label">Total Sessions</span>
+          <span className="stat-label">Total</span>
         </div>
         <div className="stat-card">
           <span className="stat-value">{user.streak}</span>
-          <span className="stat-label">Day Streak</span>
+          <span className="stat-label">Streak</span>
         </div>
       </div>
 
-      {/* Today's workout card */}
+      {/* Next workout card */}
       <div className="section-header">
-        <h2 className="section-title">Today's Workout</h2>
+        <h2 className="section-title">
+          {todayDone ? 'Next Up' : "Today's Workout"}
+        </h2>
         <span className="section-tag" style={{ background: program.color + '22', color: program.color }}>
           {program.emoji} {program.name}
         </span>
       </div>
 
+      {todayDone && (
+        <div className="done-today-banner">
+          <span>✅ Workout complete today — great work!</span>
+        </div>
+      )}
+
       <div className="today-card" style={{ borderColor: program.color + '44' }}>
         <div className="today-card__header">
           <div>
-            <h3 className="today-card__title">{todayDay.name}</h3>
-            <p className="today-card__focus">{todayDay.focus}</p>
+            <h3 className="today-card__title">{nextDay.name}</h3>
+            <p className="today-card__focus">{nextDay.focus}</p>
           </div>
           <div className="today-card__meta">
-            <span>{todayDay.exercises.length} exercises</span>
+            <span>Day {nextDayIndex + 1} of {program.days.length}</span>
           </div>
         </div>
 
         <div className="exercise-preview">
-          {todayDay.exercises.slice(0, 4).map((ex, i) => (
+          {nextDay.exercises.slice(0, 4).map((ex, i) => (
             <div key={i} className="exercise-preview__item">
               <span className="exercise-preview__dot" style={{ background: program.color }} />
               <span className="exercise-preview__name">{ex.name}</span>
               <span className="exercise-preview__sets">{ex.sets}×{ex.reps}</span>
             </div>
           ))}
-          {todayDay.exercises.length > 4 && (
-            <p className="exercise-preview__more">+{todayDay.exercises.length - 4} more exercises</p>
+          {nextDay.exercises.length > 4 && (
+            <p className="exercise-preview__more">+{nextDay.exercises.length - 4} more exercises</p>
           )}
         </div>
 
@@ -124,14 +144,19 @@ export default function HomeScreen({ onNavigate }) {
           onClick={handleStartWorkout}
           disabled={!!activeWorkout}
         >
-          {activeWorkout ? 'Workout in Progress' : `Start ${todayDay.name}`}
+          {activeWorkout
+            ? 'Workout in Progress'
+            : todayDone
+              ? `Start Next: ${nextDay.name}`
+              : `Start ${nextDay.name}`
+          }
         </button>
       </div>
 
-      {/* Last workout */}
+      {/* Last workout recap */}
       {lastWorkout && (
         <>
-          <h2 className="section-title" style={{ marginTop: '24px' }}>Last Session</h2>
+          <h2 className="section-title" style={{ marginTop: 24 }}>Last Session</h2>
           <div className="last-workout-card">
             <div className="last-workout__info">
               <p className="last-workout__name">{lastWorkout.dayName}</p>
@@ -145,7 +170,7 @@ export default function HomeScreen({ onNavigate }) {
       )}
 
       {/* Program overview */}
-      <div className="section-header" style={{ marginTop: '24px' }}>
+      <div className="section-header" style={{ marginTop: 24 }}>
         <h2 className="section-title">Your Program</h2>
         <button className="text-btn" onClick={() => onNavigate('programs')}>Change</button>
       </div>
@@ -160,8 +185,7 @@ export default function HomeScreen({ onNavigate }) {
         </div>
       </div>
 
-      {/* Bottom spacer for nav */}
-      <div style={{ height: '24px' }} />
+      <div style={{ height: 24 }} />
     </div>
   );
 }

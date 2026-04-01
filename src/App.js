@@ -13,11 +13,10 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('home');
   const activeWorkout = useSelector(s => s.workout.active);
 
-  // When a workout is active, always show the workout screen
-  const effectiveTab = activeWorkout ? 'workout' : activeTab;
-
+  // Free navigation — user can browse the app while a workout is in progress.
+  // The Workout tab shows a pulsing dot indicator when active.
   const renderScreen = () => {
-    switch (effectiveTab) {
+    switch (activeTab) {
       case 'home':     return <HomeScreen onNavigate={setActiveTab} />;
       case 'programs': return <ProgramsScreen onNavigate={setActiveTab} />;
       case 'workout':  return <WorkoutScreen onNavigate={setActiveTab} />;
@@ -32,7 +31,7 @@ export default function App() {
       <div className="screen-container">
         {renderScreen()}
       </div>
-      <BottomNav activeTab={effectiveTab} onTabChange={setActiveTab} />
+      <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
       <FloatingCoach />
       <CoachModal />
     </div>
