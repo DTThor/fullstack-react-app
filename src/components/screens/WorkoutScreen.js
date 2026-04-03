@@ -15,6 +15,7 @@ import {
 import { playRestEndBeep, requestNotificationPermission, showRestEndNotification } from '../../utils/audio';
 import { getAlternatives } from '../../data/exercisePool';
 import MuscleImage from '../MuscleImage';
+import ExerciseAnimation from '../ExerciseAnimation';
 
 // ── Rest Timer ───────────────────────────────────────────────────────────────
 function RestTimer({ restEndTime, onSkip }) {
@@ -203,15 +204,12 @@ function ExerciseCard({ exercise, exerciseIndex, isCurrent, onFocus }) {
         </div>
       </div>
 
-      {/* Form image / muscle diagram */}
+      {/* Animated exercise demo */}
       {showImage && (
-        <div className="form-image-panel">
-          <MuscleImage muscle={exercise.muscle} />
+        <div className="form-image-panel--anim">
+          <ExerciseAnimation exerciseName={exercise.name} muscle={exercise.muscle} />
           {exercise.notes && (
-            <div className="form-cues">
-              <p className="form-cues__title">Key cues</p>
-              <p className="form-cues__text">💡 {exercise.notes}</p>
-            </div>
+            <p className="form-cues__inline">💡 {exercise.notes}</p>
           )}
         </div>
       )}
